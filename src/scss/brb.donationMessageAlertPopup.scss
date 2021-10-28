@@ -1,0 +1,20 @@
+@import 'variables.scss';
+
+.donationMessageHead{
+  color: $elWhite;
+  width: 500px;
+  position: absolute;
+  text-align: center;
+  font-size: 50px;
+  top:90px;
+}
+
+.donationMessageFrom{
+  color: $elWhite;
+  width: 500px;
+  display: block;
+  position: absolute;
+  text-align: center;
+  font-size: 30px;
+  top:140px;
+}

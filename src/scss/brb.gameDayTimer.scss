@@ -1,0 +1,60 @@
+@import 'variables.scss';
+
+.amountRaisedHead,
+.timerHead {
+  color: $elWhite;
+  width: 240px;
+  display: block;
+  position: absolute;
+  text-align: center;
+  font-size: 20px;
+}
+.amountRaisedHead {
+  top: 210px;
+  left: 10px;
+  text-align: left;
+}
+.timerHead {
+  top: 210px;
+  left: 240px;
+  text-align: right;
+}
+
+.amountRaisedBody,
+.timerBody {
+  color: $elWhite;
+  width: 240px;
+  display: block;
+  position: absolute;
+  font-size: 40px;
+}
+.amountRaisedBody {
+  top: 225px;
+  left: 10px;
+  text-align: left;
+}
+.timerBody {
+  top: 230px;
+  left: 240px;
+  text-align: right;
+}
+
+.profileAvatar {
+  border-radius: 3.14em;
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  left: 175px;
+  top: 20px;
+}
+
+.profileUsername {
+  border-radius: 3.14em;
+  position: absolute;
+  left: 175px;
+  top: 170px;
+  width: 150px;
+  text-align: center;
+  font-size: 20px;
+  color: $elWhite;
+}
