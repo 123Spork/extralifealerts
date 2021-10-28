@@ -1,18 +1,24 @@
 import mustache from 'mustache'
-import config, { SceneContentData } from './config'
-import { ScreenEnum } from './helper'
-import { getScene, screenKeys } from './helper'
+import { CustomControllers, SceneContentData } from './config'
+import { getConfigForScreen, getDivById, ScreenEnum } from './helper'
+import { screenKeys } from './helper'
+import { api as elApi } from './extra-life.client'
 import './scss/main.scss'
+import SoundManager from './soundManager'
 
 export default class ScreenManager {
   currentScreen: ScreenEnum
-  constructor() {
+  soundManager: SoundManager
+
+  constructor(soundManager: SoundManager) {
     this.hideScreen = this.hideScreen.bind(this)
     this.showScreen = this.showScreen.bind(this)
     this.goToScreen = this.goToScreen.bind(this)
-    this.generateSceneContent = this.generateSceneContent.bind(this)
-
+    this.processAndActivateScreenContent = this.processAndActivateScreenContent.bind(
+      this
+    )
     this.currentScreen = ScreenEnum.gameDayTimer
+    this.soundManager = soundManager
   }
 
   hideScreen(divId: string): void {
@@ -30,16 +36,58 @@ export default class ScreenManager {
     this.showScreen(divId)
   }
 
-  goToRegularScreen():void{
-    this.showScreen(ScreenEnum.gameDayTimer)
+  generateContent(template: string, data: Record<string, any>): string {
+    return mustache.render(template, data)
   }
 
-  generateSceneContent(
-    screen: ScreenEnum,
-    data: SceneContentData
-  ): string {
-    const scene = getScene()
-    const template = config.content[scene][screen].template
-    return mustache.render(template, data)
-  }  
+  setDivContentById(
+    id: string,
+    template: string,
+    data: Record<string, any>
+  ): void {
+    getDivById(id).innerHTML = mustache.render(template, data)
+  }
+
+  async processAndActivateScreenContent(
+    screenName: ScreenEnum,
+    sceneContentData: SceneContentData
+  ) {
+    const screenConfig = getConfigForScreen(screenName)
+    let content
+    if (screenConfig.override) {
+      content = await screenConfig.override(sceneContentData, {
+        screenManager: this,
+        elAPIManager: elApi,
+        soundManager: this.soundManager
+      } as CustomControllers)
+    } else {
+      const template = screenConfig.template
+      content = this.generateContent(template, sceneContentData)
+    }
+    getDivById(screenName).innerHTML = content
+    this.goToScreen(screenName)
+    console.log(screenConfig)
+    if (screenConfig.playSound === true) {
+      this.soundManager.playSound(screenConfig.soundUrl || 'sounds/cash.mp3')
+    }
+    if (screenConfig.speak === true) {
+      this.soundManager.saySomething(
+        this.generateContent(
+          screenConfig.speakTemplate || 'Default sentence. Overwrite me!',
+          sceneContentData
+        )
+      )
+    }
+  }
+
+  async createContentChangeTimeout(
+    screenName: ScreenEnum,
+    timeout: number,
+    sceneContentData: SceneContentData
+  ) {
+    const self = this
+    window.setTimeout(async (): Promise<void> => {
+      self.processAndActivateScreenContent(screenName, sceneContentData)
+    }, timeout)
+  }
 }

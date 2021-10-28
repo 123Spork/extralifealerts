@@ -6,69 +6,64 @@ import {
   Team
 } from './extra-life.client'
 import config, { SceneContentData } from './config'
-import { getDivById, getScene, ScreenEnum } from './helper'
+import { getDivById, getScene, getTimeDown, getTimeUp, ScreenEnum } from './helper'
 import SceneManager from './screenManager'
+import SoundManager from './soundManager'
 import './scss/main.scss'
 
 export default class App {
   screenManager: SceneManager
+  soundManager: SoundManager
   hasInitialisedExistingDonations: boolean
   handledDonationIds: string[]
   participant: Participant | null
   team: Team | null
   timeInterval: number | null
+  defaultScreen: string | null
 
   constructor() {
-    this.checkForNewDonations = this.checkForNewDonations.bind(this)
-    this.setDonationMode = this.setDonationMode.bind(this)
+    this.initializeApp = this.initializeApp.bind(this)
+    this.fetchNewDonations = this.fetchNewDonations.bind(this)
     this.fetchLatestParticipantData = this.fetchLatestParticipantData.bind(this)
+    this.fetchLatestTeamData = this.fetchLatestTeamData.bind(this)
+    this.setDonationMode = this.setDonationMode.bind(this)
+    this.setCountUpMode = this.setCountUpMode.bind(this)
+    this.setCountDownMode = this.setCountDownMode.bind(this)
+    this.checkRegularMode = this.checkRegularMode.bind(this)
+    this.setRegularMode = this.setRegularMode.bind(this)
 
-    this.screenManager = new SceneManager()
-    this.hasInitialisedExistingDonations = true
+    this.soundManager = new SoundManager()
+    this.screenManager = new SceneManager(this.soundManager)
+    this.hasInitialisedExistingDonations = false
     this.handledDonationIds = []
     this.participant = null
     this.team = null
     this.timeInterval = null
-    this.setIntervals()
+    this.defaultScreen = null
+    this.initializeApp()
   }
 
-  async processAndActivateDivContent(
-    screenName: ScreenEnum,
-    sceneContentData: SceneContentData
-  ) {
-    const scene = getScene()
-    let content
-    if (config.content[scene][screenName].override) {
-      content = await (config.content[scene][screenName] as any).override(
-        sceneContentData,
-        {
-          screenManager: this.screenManager,
-          elApi,
-          soundManager: 'TBC'
-        }
-      )
-    } else {
-      content = this.screenManager.generateSceneContent(
-        screenName,
-        sceneContentData
-      )
+  async initializeApp(): Promise<void> {
+
+    if(!config.content[getScene()]){
+      getDivById('root').innerHTML = "NOT RUNNING, NO CONFIGURATION HAS BEEN CREATED FOR: /" + getScene()
+      return
     }
-    getDivById(screenName).innerHTML = content
-    this.screenManager.goToScreen(screenName)
+
+    window.setInterval(() => {
+      this.fetchNewDonations()
+      this.fetchLatestTeamData()
+      this.fetchLatestParticipantData()
+    }, 60000)
+    await this.fetchLatestParticipantData()
+    //await this.fetchLatestTeamData()
+    await this.fetchNewDonations()
+
+    window.setInterval(this.checkRegularMode, 1000)
+    this.checkRegularMode()
   }
 
-  async createContentChangeTimeout(
-    screenName: ScreenEnum,
-    timeout: number,
-    sceneContentData: SceneContentData
-  ) {
-    const self = this
-    window.setTimeout(async (): Promise<void> => {
-      self.processAndActivateDivContent(screenName, sceneContentData)
-    }, timeout)
-  }
-
-  async checkForNewDonations(): Promise<void> {
+  async fetchNewDonations(): Promise<void> {
     if (!this.hasInitialisedExistingDonations) {
       const donations: Donation[] = await getParticipantDonations()
       const donationIds: string[] = donations.map((donation): string => {
@@ -89,7 +84,7 @@ export default class App {
           return donation.donationID
         })
       )
-      if(this.timeInterval){
+      if (this.timeInterval) {
         window.clearInterval(this.timeInterval)
       }
       await this.setDonationMode(newDonations)
@@ -105,32 +100,34 @@ export default class App {
   }
 
   async setDonationMode(donations: Donation[]): Promise<void> {
-    const scene = getScene()
     const popupScreen: ScreenEnum = ScreenEnum.donationAlertPopup
-    const popupTimeout = config.content[scene][popupScreen].timeout
+    const popupTimeout = config.donationPopupTimeout
     const messageScreen: ScreenEnum = ScreenEnum.donationAlertMessagePopup
-    const messageTimeout = config.content[scene][popupScreen].timeout
-
     let messagesShown: number = 0
 
     for (let i = 0; i < donations.length; i++) {
       let donation = donations[i]
       const sceneContentData: SceneContentData = {
-        donation,
+        donation: {
+          ...donation,
+          amount: (donation.amount.toFixed(
+            config.showDonationCents ? 2 : 0
+          ) as unknown) as number
+        },
         participant: this.participant as Participant,
         team: this.team as Team
       }
 
-      this.createContentChangeTimeout(
+      this.screenManager.createContentChangeTimeout(
         popupScreen,
-        popupTimeout * i + messagesShown * messageTimeout,
+        popupTimeout * i + messagesShown * config.donationMessagePopupTimeout,
         sceneContentData
       )
-
       if (donation.message) {
-        this.createContentChangeTimeout(
+        this.screenManager.createContentChangeTimeout(
           messageScreen,
-          popupTimeout * (i + 1) + messagesShown * messageTimeout,
+          popupTimeout * (i + 1) +
+            messagesShown * config.donationMessagePopupTimeout,
           sceneContentData
         )
         messagesShown++
@@ -138,37 +135,81 @@ export default class App {
     }
 
     window.setTimeout((): void => {
-      this.setCountUpMode()
-    }, popupTimeout * donations.length + messagesShown * messageTimeout)
+      this.setRegularMode()
+    }, popupTimeout * donations.length + messagesShown * config.donationMessagePopupTimeout)
   }
 
   async setCountUpMode(): Promise<void> {
-    //const scene = getScene()
-    this.timeInterval = window.setInterval(() => {
-      console.log(this.participant)
-      const now = new Date().getTime();
-      const distance = now - config.eventStartTimestamp
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours =  ("0"+Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).slice(-2);
-      const minutes =  ("0"+Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).slice(-2);
-      const seconds = ("0"+Math.floor((distance % (1000 * 60)) / 1000)).slice(-2);
-
-      this.processAndActivateDivContent(ScreenEnum.gameDayTimer, {
+    const resetTimer = () => {
+      this.screenManager.setDivContentById(
+        config.timer.elementId,
+        config.timer.template,
+        getTimeUp()
+      )
+    }
+    this.timeInterval = window.setInterval(resetTimer, 1000)
+    this.screenManager.processAndActivateScreenContent(
+      ScreenEnum.gameDayTimer,
+      {
         participant: this.participant as Participant,
         team: this.team as Team,
-        extraData: { timer: `${days>1?days+"d:":""}${hours}:${minutes}:${seconds}` }
-      })
-    }, 1000)
-    this.screenManager.goToRegularScreen()
+        extraData: {
+          timer: getTimeUp()
+        }
+      }
+    )
+    resetTimer()
+    this.screenManager.goToScreen(ScreenEnum.gameDayTimer)
   }
 
-  async setIntervals(): Promise<void> {
-    window.setInterval(this.checkForNewDonations, 60000)
-    window.setInterval(this.fetchLatestParticipantData, 60000)
-    window.setInterval(this.fetchLatestTeamData, 60000)
-    await this.fetchLatestParticipantData()
-    this.setCountUpMode()
-    //  this.fetchLatestTeamData()
-    //  this.checkForNewDonations()
+  async setCountDownMode(): Promise<void> {
+    const resetTimer = () => {
+      this.screenManager.setDivContentById(
+        config.timer.elementId,
+        config.timer.template,
+        getTimeDown()
+      )
+    }
+    this.timeInterval = window.setInterval(resetTimer, 1000)
+    this.screenManager.processAndActivateScreenContent(
+      ScreenEnum.gameDayCountdownTimer,
+      {
+        participant: this.participant as Participant,
+        team: this.team as Team,
+        extraData: {
+          timer: getTimeDown()
+        }
+      }
+    )
+    resetTimer()
+    this.screenManager.goToScreen(ScreenEnum.gameDayCountdownTimer)
+  }
+
+  checkRegularMode() {
+    const now = new Date().getTime()
+    const screen =
+      now - config.eventStartTimestamp > 0
+        ? ScreenEnum.gameDayTimer
+        : ScreenEnum.gameDayCountdownTimer
+    if (screen !== this.defaultScreen) {
+      this.defaultScreen = screen
+      if (
+        this.screenManager.currentScreen === ScreenEnum.gameDayTimer ||
+        ScreenEnum.gameDayCountdownTimer
+      ) {
+        this.setRegularMode()
+      }
+    }
+  }
+
+  setRegularMode() {
+    if (this.timeInterval) {
+      window.clearInterval(this.timeInterval)
+    }
+    if (this.defaultScreen === ScreenEnum.gameDayTimer) {
+      this.setCountUpMode()
+    } else {
+      this.setCountDownMode()
+    }
   }
 }
