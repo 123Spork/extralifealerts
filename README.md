@@ -17,6 +17,64 @@ npm run watch
 npm install
 npm run build
 ```
+## Configuring
+In your build go to **/assets/base-configuration.json**
+
+Before we start:
+- Assume all timestamps are UTC milliseconds.
+- Look at the existing file to see the default values.
+
+The file is laid out as follows.
+```javascript
+{
+  participantId: //your extra life id
+  teamId: //your extra life team
+  eventStartTimestamp: //event start time
+  showDonationCents: //show donation decimalised
+  donationPopupTimeout: //time duration the donation popup shows
+  donationMessagePopupTimeout: //time duration the donation message shows
+  speech: {
+    voice: //1 to 10, which voice you want to use
+    volume: //0 to 1, voice volume
+    rate: //0.1 to 10, voice rate
+    pitch: //0 to 2, voice pitch
+    language: //voice language code: "en", "es" etc
+  }
+  timer: {
+    elementId: //element id of the on screen timer: "#timer"
+    template: //Mustache template for time format: "{{DD}}d:{{hh}}:{{mm}}:{{ss}}"
+  }
+  content: {
+    brb:{ //url address that this config applies to (brb.html)
+        donationAlertPopup: { //scene/ div id
+            override: //custom function, see **Advanced Configuration**
+            template: //mustache template for scene, see **Templating**
+            speak: //true or false if you want to speak on scene entry
+            speakTemplate: //Mustache template of what you want the screen to say
+            playSound: //true or false if you want audio to play on entry
+            soundUrl: //url of the audio to play
+        }
+        donationAlertMessagePopup: //...SAME AS ABOVE
+        gameDayTimer: //...SAME AS ABOVE
+        gameDayCountdownTimer: //...SAME AS ABOVE
+    }
+  }
+}
+```
+
+Page based configuration can be achieved by duplicating the default brb.html file into any other name you choose and then appending a new element to the **content** object above. This allows you to service different styled themes for different stream scenes depending on need.
+
+Here's an example.
+```javascript
+{
+    ...,
+    content: {
+        brb: { ... } //theme content applicable to brb.html
+        game: { ... } //theme content applicable to game.html
+    }
+}
+```
+
 
 ## Templating
 This system uses mustache templating. An example of which you can see below...
@@ -25,17 +83,30 @@ This system uses mustache templating. An example of which you can see below...
     New Donation!
 </div>
 <div class="donationFrom">
-    Donation from {{#donation.displayName}}{{donation.displayName}}{{/donation.displayName}}{{^donation.displayName}}Anonymous{{/donation.displayName}}
+    Donation from {{donation.displayName}}
 </div>
 <div class="donationAmount">
     \${{donation.amount}}!
 </div>
 ```
-The templates are applied based on context. So the above would be inserted into whatever scene it is configured on top of. See **Styling** to understand how you can manipulate the look and feel of this. See **Configuring** to find out what templating objects you can use.
+Templates are applied in real time based on context, inserted into whatever scene it is configured on top of. For instance, the below example will configure the formatting of the **donationAlertPopup** screen.
 
-----
+```javascript
+{
+    ...,
+    content: {
+        brb:{
+            donationAlertPopup: { //scene/ div id
+                ...,
+                template: "<div>Donation! {{donation.displayName}}</div>"
+                speechTemplate: "New dono from {{donation.displayName}}"
+            }
+        }
+    }
+}
+```
 
-Within the above you can see an example mustache template. The available fields that are usable in mustache templates using this system are below. **Be aware that in the non-donation scenes, donation may not be available.**
+Within the above you can see an example mustache template. The available fields that are available to use are below. **Be aware that in the non-donation scenes, the donation object may not be available.**
 
 ```typescript
 {
@@ -120,64 +191,6 @@ For example:
 
 ## Styling
 This app builds with an external output css file. Simply modify the .css file with whatever you want. As noted in **Templates**, the templates support custom html, so feel free to add you own classes to style these as needed reflecing your output requirements.
-
-## Configuring
-In your build go to **/assets/base-configuration.json**
-
-Before we start:
-- Assume all timestamps are UTC milliseconds.
-- Look at the existing file to see the default values.
-
-The file is laid out as follows.
-```javascript
-{
-  participantId: //your extra life id
-  teamId: //your extra life team
-  eventStartTimestamp: //event start time
-  showDonationCents: //show donation decimalised
-  donationPopupTimeout: //time duration the donation popup shows
-  donationMessagePopupTimeout: //time duration the donation message shows
-  speech: {
-    voice: //1 to 10, which voice you want to use
-    volume: //0 to 1, voice volume
-    rate: //0.1 to 10, voice rate
-    pitch: //0 to 2, voice pitch
-    language: //voice language code: "en", "es" etc
-  }
-  timer: {
-    elementId: //element id of the on screen timer: "#timer"
-    template: //Mustache template for time format: "{{DD}}d:{{hh}}:{{mm}}:{{ss}}"
-  }
-  content: {
-    brb:{ //url address that this config applies to (brb.html)
-        donationAlertPopup: { //scene/ div id
-            override: //custom function, see **Advanced Configuration**
-            template: //mustache template for scene, see **Templating**
-            speak: //true or false if you want to speak on scene entry
-            speakTemplate: //Mustache template of what you want the screen to say
-            playSound: //true or false if you want audio to play on entry
-            soundUrl: //url of the audio to play
-        }
-        donationAlertMessagePopup: //...SAME AS ABOVE
-        gameDayTimer: //...SAME AS ABOVE
-        gameDayCountdownTimer: //...SAME AS ABOVE
-    }
-  }
-}
-```
-
-Page based configuration can be achieved by duplicating the default brb.html file into any other name you choose and then appending a new element to the **content** object above. This allows you to service different styled themes for different stream scenes depending on need.
-
-Here's an example.
-```javascript
-{
-    ...,
-    content: {
-        brb: { ... } //theme content applicable to brb.html
-        game: { ... } //theme content applicable to game.html
-    }
-}
-```
 
 ## Advanced Configuration
 You can provide custom functions to your config change the display output based on your own custom logic. This allows, for instance, a custom script to run that displays a different output if a donation comes in at $100. These custom functions allow access to internal mechanisms to perform your custom actions.
