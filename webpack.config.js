@@ -1,14 +1,15 @@
-var path = require("path");
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+var path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyPlugin = require('webpack-copy-plugin')
 
 var config = {
-  entry: ["./src/index.tsx"],
+  entry: ['./src/index.tsx', __dirname + '/src/scss/main.scss'],
   output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: "bundle.min.js"
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.min.js'
   },
   resolve: {
-    extensions: [".ts", ".tsx", ".js"]
+    extensions: ['.ts', '.tsx', '.js']
   },
   module: {
     rules: [
@@ -18,21 +19,44 @@ var config = {
       },
       {
         test: /\.s[ac]ss$/i,
-        use: ['style-loader', 'css-loader',"sass-loader"],
-      },
+        use: [
+          'style-loader',
+          {
+            loader: 'file-loader',
+            options: { outputPath: '.', name: 'style.min.css' }
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                outputStyle: 'expanded'
+              }
+            }
+          }
+        ]
+      }
     ]
   },
   plugins: [
+    new CopyPlugin({
+      dirs: [
+        {
+          from: path.resolve(__dirname, './src/assets'),
+          to: path.resolve(__dirname, './dist/assets'),
+          toType: 'file'
+        }
+      ]
+    }),
     new HtmlWebpackPlugin({
       template: './src/index.html'
     })
   ],
   devServer: {
-    contentBase: path.join(__dirname, './src/assets'),
+    contentBase: path.join(__dirname, 'src'),
     contentBasePublicPath: '/',
     historyApiFallback: true,
-    hot:true
+    hot: true
   }
-};
+}
 
-module.exports = config;
+module.exports = config
