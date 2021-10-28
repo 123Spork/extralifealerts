@@ -1,25 +1,33 @@
 import { Donation, ELApi, Participant, Team } from './extra-life.client'
+import { TimerContent } from './helper'
 import ScreenManager from './screenManager'
+import SoundManager from './soundManager'
 
 export interface SceneContentData {
   donation?: Donation
   participant?: Participant
   team?: Team
   extraData?: {
-    timer?: string
+    timer?: TimerContent
   }
 }
 
 export interface CustomControllers {
   screenManager: ScreenManager
   elAPIManager: ELApi
-  soundManager: string
+  soundManager: SoundManager
 }
 
 export interface ScreenContentConfig {
-  override?: (sceneData: SceneContentData, controllers: CustomControllers) => Promise<string>
+  override?: (
+    sceneData: SceneContentData,
+    controllers: CustomControllers
+  ) => Promise<string>
   template: string
-  timeout: number
+  speak?: boolean
+  speakTemplate?: string
+  playSound?: boolean
+  soundUrl?: string
 }
 
 export interface ScreenConfig {
@@ -34,49 +42,23 @@ export interface Config {
   participantId: number
   teamId: number
   eventStartTimestamp: number
+  showDonationCents: boolean
+  donationPopupTimeout: number
+  donationMessagePopupTimeout: number
+  speech: {
+    voice: number
+    volume: number
+    rate: number
+    pitch: number
+    language: string
+  }
+  timer: {
+    elementId: string
+    template: string
+  }
   content: {
     [key: string]: ScreenConfig
   }
 }
-
-const defaultScreenContent: ScreenConfig = {
-  donationAlertPopup: {
-    template: `
-    <div>Donation from {{#donation.displayName}}{{donation.displayName}}{{/donation.displayName}}{{^donation.displayName}}Anonymous{{/donation.displayName}}</div>
-    <div>for \${{donation.amount}}!</div>`,
-    timeout: 15000,
-    /*override: async (sceneContentData: SceneContentData, _controller: CustomControllers) => {
-      if (sceneContentData.donation?.displayName) {
-        return sceneContentData.donation.displayName
-      }
-      return 'Anonymous'
-    }*/
-  },
-  donationAlertMessagePopup: {
-    template:
-      '"{{donation.message}}" - {{#donation.displayName}}{{donation.displayName}}{{/donation.displayName}}{{^donation.displayName}}Anonymous{{/donation.displayName}}',
-    timeout: 15000
-  },
-  gameDayTimer: {
-    template: `
-    <div>{{extraData.timer}}  You have raised \${{participant.sumDonations}}!</div>`,
-    timeout: 15000
-  },
-  gameDayCountdownTimer: {
-    template: 'THERS BEEN A MURDER {donationId}',
-    timeout: 15000
-  }
-  // donationTriggers: {
-  //   template: 'THERS BEEN A MURDER {donationId}',
-  //   timeout: 15000
-  // },
-}
-
-export default {
-  participantId: 454390,
-  teamId: 55961,
-  eventStartTimestamp: 1635205806000,
-  content: {
-    '/brb': defaultScreenContent
-  }
-} as Config
+// @ts-ignore
+export default Window.globalConfiguration as Config
