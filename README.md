@@ -30,9 +30,9 @@ The file is laid out as follows.
   participantId: //your extra life id
   teamId: //your extra life team
   eventStartTimestamp: //event start time
-  showDonationCents: //show donation decimalised
-  donationPopupTimeout: //time duration the donation popup shows
-  donationMessagePopupTimeout: //time duration the donation message shows
+  showDonationCents: //show donations in decimal format ($50 | $50.00)
+  donationPopupTimeout: //length of time to show the donation popup
+  donationMessagePopupTimeout: //length of time to show the donation message popup
   speech: {
     voice: //1 to 10, which voice you want to use
     volume: //0 to 1, voice volume
@@ -41,22 +41,22 @@ The file is laid out as follows.
     language: //voice language code: "en", "es" etc
   }
   timer: {
-    elementId: //element id of the on screen timer: "#timer"
-    template: //Mustache template for time format: "{{DD}}d:{{hh}}:{{mm}}:{{ss}}"
+    elementId://element id of the on screen timer in your scene: "#timer"
+    template: //template for time format: "{{DD}}d:{{hh}}:{{mm}}:{{ss}}"
   }
   content: {
     brb:{ //url address that this config applies to (brb.html)
-        donationAlertPopup: { //scene/ div id
+        donationAlertPopup: { //scene/ div id see other available scenes below
             override: //custom function, see **Advanced Configuration**
             template: //mustache template for scene, see **Templating**
-            speak: //true or false if you want to speak on scene entry
-            speakTemplate: //Mustache template of what you want the screen to say
+            speak: //true or false if you want text-to-speech on scene entry
+            speakTemplate: //template of what you want the screen to say
             playSound: //true or false if you want audio to play on entry
             soundUrl: //url of the audio to play
         }
-        donationAlertMessagePopup: //...SAME AS ABOVE
-        gameDayTimer: //...SAME AS ABOVE
-        gameDayCountdownTimer: //...SAME AS ABOVE
+        donationAlertMessagePopup: { ... } //same as donationAlertPopup
+        gameDayTimer: { ... } //same as donationAlertPopup
+        gameDayCountdownTimer: { ... } //same as donationAlertPopup
     }
   }
 }
