@@ -129,7 +129,7 @@ Before we start:
 - Look at the existing file to see the default values.
 
 The file is laid out as follows.
-```JSON
+```javascript
 {
   participantId: //your extra life id
   teamId: //your extra life team
