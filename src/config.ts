@@ -45,9 +45,9 @@ const defaultScreenContent: ScreenConfig = {
     <div>Donation from {{#donation.displayName}}{{donation.displayName}}{{/donation.displayName}}{{^donation.displayName}}Anonymous{{/donation.displayName}}</div>
     <div>for \${{donation.amount}}!</div>`,
     timeout: 15000,
-    /*override: async (elData: ELData, _controller: CustomControllers) => {
-      if (elData.donation?.displayName) {
-        return elData.donation.displayName
+    /*override: async (sceneContentData: SceneContentData, _controller: CustomControllers) => {
+      if (sceneContentData.donation?.displayName) {
+        return sceneContentData.donation.displayName
       }
       return 'Anonymous'
     }*/
