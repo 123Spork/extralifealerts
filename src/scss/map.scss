@@ -1,0 +1,106 @@
+#historymap-wrapper,
+#historymap-map-container {
+  position: relative;
+  width:100vw;
+  height:100vh;
+}
+
+#historymap-map-wrapper {
+  position: relative;
+  width: 100vw;
+  height:100vh;
+  overflow: hidden;
+  color: $textColor;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  :focus:not(:focus-visible) {
+    outline: 0;
+  }
+
+  #historymap-map-image {
+    display: block;
+    position: absolute;
+    left: 0;
+    top:0px;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+  }
+
+  #historymap-map-controls-zoom {
+    display: flex;
+    position:absolute;
+    bottom:80px;
+    margin-right: 5px;
+    overflow: hidden;
+    width:100vw;
+    height:80px;
+    padding-top:25px;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  #historymap-zoom-out-button,
+  #historymap-zoom-in-button {
+    background-color: transparent;
+    border: none;
+    border-radius: 0.3em;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    margin-left: 5px;
+    padding: 8;
+    overflow: visible;
+    text-transform: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    height: 30px;
+    position: relative;
+    background: #666;
+    color: white;
+    transition: background-color 250ms;
+
+        &:hover {
+        background: $textColor;
+      }
+    
+
+    &:active {
+      background: $textColor;
+    }
+
+    &.disabled {
+      background: #ccc;
+    }
+  }
+
+  .country {
+    stroke: #fff;
+    stroke-width: 1;
+    stroke-linejoin: round;
+    transition: fill 250ms, stroke 250ms;
+
+    &[data-link] {
+      cursor: pointer;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        stroke: $mapActiveStrokeColor;
+        stroke-width: $mapActiveStrokeWidth;
+      }
+    }
+
+    &.active {
+      stroke: $mapActiveStrokeColor;
+      stroke-width: $mapActiveStrokeWidth;
+    }
+  }
+}

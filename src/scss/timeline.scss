@@ -1,0 +1,16 @@
+#historymap-timeline{
+    width:100%;
+    height:200px;
+    bottom:-100px;
+    position:absolute !important;
+    max-height:200px;
+    background-color: white;
+}
+
+.vis-background{
+    height:100px !important;
+}
+
+   .vis-dot{
+  display:none !important;
+}
