@@ -14,9 +14,12 @@ export default class ScreenManager {
     this.hideScreen = this.hideScreen.bind(this)
     this.showScreen = this.showScreen.bind(this)
     this.goToScreen = this.goToScreen.bind(this)
+    this.generateContent = this.generateContent.bind(this)
+    this.setDivContentById = this.setDivContentById.bind(this)
     this.processAndActivateScreenContent = this.processAndActivateScreenContent.bind(
       this
     )
+    this.createContentChangeTimeout = this.createContentChangeTimeout.bind(this)
     this.currentScreen = ScreenEnum.gameDayTimer
     this.soundManager = soundManager
   }
