@@ -1,16 +1,10 @@
-@import 'variables.scss';
-@import 'map.scss';
-@import 'timeline.scss';
-@import 'tooltip.scss';
-@import 'vis-timeline.scss';
-
 body {
   margin: 0px;
   padding:0px;
   height: -webkit-fill-available;
   width: -webkit-fill-available;
   overflow: hidden;
-  background-color: $oceanColor;
+  background-color: white;
 }
 
 .hide{

@@ -25,6 +25,8 @@ Right now we're a bit light on the ground for flexible configuration, so bear wi
 //go to
 src/config.ts
 //modify the exported config object to manipulate alerting output
+//note:: the running service url (for example /brb) directly ties to the content key
+//for this reason, the base / path will likely break at this time
 ```
 ```
 //available configurable values for mustache templating
