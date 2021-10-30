@@ -1,8 +1,9 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import testData from './assets/testData.json'
 import config from './config'
 
 export interface Participant {
-  displayName: number
+  displayName: string
   fundraisingGoal: number
   eventName: string
   links: {
@@ -79,6 +80,17 @@ export interface ELApi {
   getTeamDonations: () => Promise<Donation[]>
 }
 
+const mock = async (type: string): Promise<Participant|Donation[]> => {
+  return new Promise((resolve) => {
+    if (type == 'participant') {
+      resolve(testData.participant)
+    }
+    if (type == 'donations') {
+      resolve(testData.donations)
+    }
+  })
+}
+
 export const request = async (url: string): Promise<AxiosResponse> => {
   const config: AxiosRequestConfig = {
     url: `https://www.extra-life.org/api/${url}`,
@@ -88,6 +100,9 @@ export const request = async (url: string): Promise<AxiosResponse> => {
 }
 
 export const getParticipantInfo = async (): Promise<Participant> => {
+  if(config.mockEnabled){
+    return(mock('participant') as unknown as Participant)
+  }
   let response: AxiosResponse<Participant>
   try {
     response = await request(`participants/${config.participantId}`)
@@ -98,6 +113,9 @@ export const getParticipantInfo = async (): Promise<Participant> => {
 }
 
 export const getParticipantDonations = async (): Promise<Donation[]> => {
+  if(config.mockEnabled){
+    return(mock('donations') as unknown as Donation[])
+  }
   let response: AxiosResponse<Donation[]>
   try {
     response = await request(`participants/${config.participantId}/donations`)
@@ -142,5 +160,5 @@ export const api = {
   getTeamDonations,
   getTeamInfo,
   getParticipantInfo,
-  getTeamParticipants,
-}as ELApi
+  getTeamParticipants
+} as ELApi

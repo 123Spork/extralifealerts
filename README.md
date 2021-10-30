@@ -33,13 +33,9 @@ The file is laid out as follows.
   showDonationCents: //show donations in decimal format ($50 | $50.00)
   donationPopupTimeout: //length of time to show the donation popup
   donationMessagePopupTimeout: //length of time to show the donation message popup
-  speech: {
-    voice: //1 to 10, which voice you want to use
-    volume: //0 to 1, voice volume
-    rate: //0.1 to 10, voice rate
-    pitch: //0 to 2, voice pitch
-    language: //voice language code: "en", "es" etc
-  }
+  soundVolume: //volume of the application sounds (either synthetic speech or otherwise)
+  speechLanguage: //spoken language of the speaking tools,
+  mockEnabled: //enables a developer mode,
   timer: {
     elementId://element id of the on screen timer in your scene: "#timer"
     template: //template for time format: "{{DD}}d:{{hh}}:{{mm}}:{{ss}}"
