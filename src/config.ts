@@ -45,13 +45,9 @@ export interface Config {
   showDonationCents: boolean
   donationPopupTimeout: number
   donationMessagePopupTimeout: number
-  speech: {
-    voice: number
-    volume: number
-    rate: number
-    pitch: number
-    language: string
-  }
+  mockEnabled?: boolean
+  soundVolume: number
+  speechLanguage: string
   timer: {
     elementId: string
     template: string
