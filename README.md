@@ -188,6 +188,23 @@ For example:
 ## Styling
 This app builds with an external output css file. Simply modify the .css file with whatever you want. As noted in **Templates**, the templates support custom html, so feel free to add you own classes to style these as needed reflecing your output requirements.
 
+## Voice Output
+This app supports windows synthetic voices. Simply set your sound configuration on to play speech (per screen, per scene) and then supply a template for it to say. 
+
+**Please note, that streamlabs has a problem running synthetic voices as the window.speechSynthesis.getVoices() command is still, for some reason, unsupported. To get synthetic voices running on streamlabs:**
+```
+1. install nodejs (google it)
+2. Go to the assets folder in a terminal. 
+    For windows you can do this by going to the folder and clicking "FILE-> OPEN IN POWERSHELL"
+3. Check you have node running by entering "node -v", you should see a version number.
+4. Enter: "node tts.js"
+5. You should see a prompt saying your server is running on port 5000
+6. Recheck your TTS in streamlabs
+```
+**Do not close window whilst you want text to speech to still work**
+
+This server hits googles text to speech service and pulls back a runnable base64 mp3 of what you're trying to say, a workaround to no synth voices. This will hopefully be removed as a feature if streamlabs gets its act together.
+
 ## Advanced Configuration
 You can provide custom functions to your config change the display output based on your own custom logic. This allows, for instance, a custom script to run that displays a different output if a donation comes in at $100. These custom functions allow access to internal mechanisms to perform your custom actions.
 

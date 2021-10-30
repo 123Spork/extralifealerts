@@ -34,7 +34,7 @@ export default class App {
 
     this.soundManager = new SoundManager()
     this.screenManager = new SceneManager(this.soundManager)
-    this.hasInitialisedExistingDonations = false
+    this.hasInitialisedExistingDonations = true
     this.handledDonationIds = []
     this.participant = null
     this.team = null
