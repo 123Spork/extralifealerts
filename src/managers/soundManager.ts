@@ -1,8 +1,8 @@
 //import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
-import { getConfig } from './config'
+import { getConfig } from '../config/config'
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 
-export default class SoundManager {
+export class SoundManager {
   isMuted: boolean
 
   constructor() {

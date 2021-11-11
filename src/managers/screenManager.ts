@@ -1,19 +1,18 @@
 import mustache from 'mustache'
-import Controller from './controller'
 
 export type ScreenFunction = (
   data: Record<string, unknown>,
-  controller: Controller
+  controller: unknown
 ) => Promise<string>
 
 export interface Screen {
   configuration: ScreenFunction
   data: Record<string, unknown>
-  controller: Controller
+  controller: unknown
   timeToShow?: number
 }
 
-export default class ScreenManager {
+export class ScreenManager {
   queuedScreens: Screen[]
   currentScreen: Screen | null
   isDirty: boolean

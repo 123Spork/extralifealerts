@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
-import testData from './testData.json'
-import config from './config'
+import testData from '../test/testData.json'
+import config from '../config/config'
 
 export interface Participant {
   displayName: string
@@ -83,7 +83,7 @@ const mock = async (type: string): Promise<Participant | Donation[]> => {
   })
 }
 
-export default class ExtraLifeManager {
+export class ExtraLifeManager {
   participant: Participant | null
   team: Team | null
   donations: Donation[]

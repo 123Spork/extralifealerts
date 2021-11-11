@@ -7,7 +7,7 @@ export interface TimerContent {
 
 export type TickCallback = (content:TimerContent) => void
 
-export default class TimeManager {
+export class TimeManager {
   currentTick: TimerContent
   tickCallback: TickCallback
   eventTime: number

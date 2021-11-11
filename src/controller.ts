@@ -1,12 +1,15 @@
-import ExtraLifeManager, {
+import config, { getConfig } from './config/config'
+import {
+  ExtraLifeManager,
   Donation,
   Participant,
-  Team
-} from './extraLifeManager'
-import config, { getConfig } from './config'
-import SceneManager, { ScreenFunction } from './screenManager'
-import SoundManager from './soundManager'
-import TimeManager, { TimerContent } from './timeManager'
+  Team,
+  SoundManager,
+  TimeManager,
+  TimerContent,
+  ScreenManager,
+  ScreenFunction
+} from './managers'
 
 export interface ScreenData {
   donation?: Donation
@@ -17,7 +20,7 @@ export interface ScreenData {
 }
 
 export default class Controller {
-  screenManager: SceneManager
+  screenManager: ScreenManager
   soundManager: SoundManager
   timeManager: TimeManager
   extraLifeManager: ExtraLifeManager
@@ -25,10 +28,10 @@ export default class Controller {
   constructor(callbacks: {
     onTimerTick: (timerTick: TimerContent) => void
     onNewDonations: (newDonations: Donation[]) => Promise<void>
-    onExtraLifeLoaded: ()=>Promise<void>
+    onExtraLifeLoaded: () => Promise<void>
   }) {
     this.soundManager = new SoundManager()
-    this.screenManager = new SceneManager()
+    this.screenManager = new ScreenManager()
     this.timeManager = new TimeManager(
       config.main.eventStartTimestamp,
       callbacks.onTimerTick
@@ -44,7 +47,7 @@ export default class Controller {
     timeToShow?: number,
     data: ScreenData = this.getData()
   ) {
-    if(typeof screenFunction==="string"){
+    if (typeof screenFunction === 'string') {
       screenFunction = getConfig().screens[screenFunction] as ScreenFunction
     }
     this.screenManager.addToScreenQueue({
@@ -55,7 +58,10 @@ export default class Controller {
     })
   }
 
-  async refreshIdInCurrent(id: string, dataOverrides:Record<string, any> = {}) {
+  async refreshIdInCurrent(
+    id: string,
+    dataOverrides: Record<string, any> = {}
+  ) {
     this.muteAudio()
     await this.screenManager.refreshIdInCurrent(id, dataOverrides)
     this.unmuteAudio()
@@ -69,11 +75,11 @@ export default class Controller {
     this.soundManager.saySomething(speechText)
   }
 
-  muteAudio(){
+  muteAudio() {
     this.soundManager.mute()
   }
 
-  unmuteAudio(){
+  unmuteAudio() {
     this.soundManager.unmute()
   }
 

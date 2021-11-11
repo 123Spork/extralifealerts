@@ -1,5 +1,5 @@
-import { CallbackFunction } from './app'
-import { ScreenFunction } from './screenManager'
+import { CallbackFunction } from '../'
+import { ScreenFunction } from '../managers'
 
 export interface Config {
   main: {

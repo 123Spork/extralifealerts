@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
 
 var config = {
-  entry: ['./src/index.tsx', __dirname + '/src/main.scss'],
+  entry: ['./src/index.tsx', __dirname + '/src/styles/main.scss'],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.min.js'
@@ -45,7 +45,7 @@ var config = {
           to: path.resolve(__dirname, "./dist/assets/"),
         },
         {
-          from: path.resolve('./src/config.js'),
+          from: path.resolve('./src/config/config.js'),
           to: path.resolve('./dist/config.js'),
           toType: 'file'
         }
