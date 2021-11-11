@@ -1,0 +1,129 @@
+$elBlack: #333;
+$elGrey: #555;
+$elWhite: #fff;
+$elGreen: #7ae522;
+$elDarkBlue: #1a4c6d;
+$elLightBlue: #26c2eb;
+
+body {
+  margin: 0px;
+  padding: 0px;
+  height: -webkit-fill-available;
+  width: -webkit-fill-available;
+  overflow: hidden;
+  background-color: white;
+  font-family: "Arial", monospace;
+  font-weight: bold;
+}
+
+.hide {
+  display: none;
+}
+
+.screen {
+  background-color: $elBlack;
+  width: 620px;
+  height: 65px;
+}
+
+/*MAIN_SCREEN*/
+.amountRaisedHead,
+.timerHead {
+  color: $elWhite;
+  width: 310px;
+  position: absolute;
+  font-size: 30px;
+  height:30px;
+  line-height: 30px;
+}
+.amountRaisedBody,
+.timerBody {
+  color: $elLightBlue;
+  width: 310px;
+  position: absolute;
+  font-size: 35px;
+  height:35px;
+  line-height: 35px;
+  top: 30px;
+}
+.amountRaisedHead,
+.amountRaisedBody {
+  text-align: left;
+}
+.timerHead,
+.timerBody {
+  left: 310px;
+  text-align: right;
+}
+
+/*DONATION_SCREEN*/
+.donationHead,
+.donationFrom {
+  color: $elWhite;
+  width: 310px;
+  position: absolute;
+  font-size: 30px;
+  font-size: 30px;
+  height:30px;
+  line-height: 30px;
+}
+.donationFrom {
+  top: 30px;
+  color: $elLightBlue;
+  font-size: 35px;
+  height:35px;
+  line-height: 35px;
+}
+.donationAmount {
+  color: $elLightBlue;
+  width: 310px;
+  position: absolute;
+  font-size: 65px;
+  line-height: 65px;
+  height:65px;
+  left: 310px;
+  top: 0px;
+  text-align: right;
+}
+
+/*DONATION_MESSAGE_SCREEN*/
+.donationMessageFrom {
+  width: 620px;
+  position: absolute;
+  color: $elLightBlue;
+  font-size: 35px;
+  line-height: 35px;
+  text-align: center;
+}
+.donationMessageHead{
+  width: 620px;
+  position: absolute;
+  color: $elWhite;
+  font-size: 18px;
+  line-height: 30px;
+  top:35px;
+  text-align: center;
+}
+
+/*ADVERT_SCREEN*/
+.advert{
+  width: 620px;
+  position: absolute;
+  color: $elWhite;
+  font-size: 35px;
+  line-height: 30px;
+  top:15px;
+  text-align: center;
+}
+
+/*LARGEST_DONO_SCREEN*/
+.largestDonator{
+  width: 620px;
+  position: absolute;
+  color: $elWhite;
+  font-size: 30px;
+  line-height: 30px;
+  top:15px;
+  text-align: center;
+}
+

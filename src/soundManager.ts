@@ -1,13 +1,20 @@
-import config from './config'
-import { getBase64Voice } from './synthetic-voice-proxy-client'
+//import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import { getConfig } from './config'
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 
 export default class SoundManager {
+  isMuted: boolean
+
   constructor() {
     this.playSound = this.playSound.bind(this)
     this.saySomething = this.saySomething.bind(this)
+    this.isMuted = false
   }
 
   playSound(soundUrl: string, onComplete: () => void = () => {}): void {
+    if (this.isMuted) {
+      return
+    }
     const audio = new Audio(soundUrl)
     audio.addEventListener('ended', () => {
       audio.pause()
@@ -24,29 +31,29 @@ export default class SoundManager {
     }
   }
 
-  delaySound(
-    soundUrl: string,
-    timeout: number,
-    onComplete: () => void = () => {}
-  ): void {
-    const self = this
-    window.setTimeout(() => {
-      self.playSound(soundUrl, onComplete)
-    }, timeout)
+  async saySomething(speechText: string) {
+    if (this.isMuted) {
+      return
+    }
+     const config: AxiosRequestConfig = {
+      url: `https://google-tts-proxy.herokuapp.com/base64`,
+      method: 'POST',
+      data: { msg: speechText, language: getConfig().main.speechLanguage }
+    }
+    let response: AxiosResponse<string>
+    try {
+      response = await axios.request(config)
+    } catch (error) {
+      throw error
+    }
+    this.playSound('data:audio/mp3;base64,' + response.data)
   }
 
-  async saySomething(speechText: string) {
-    if (window.speechSynthesis.getVoices().length < 1) {
-      let base64 = await getBase64Voice(speechText)
-      this.playSound('data:audio/mp3;base64,' + base64)
-    }
-    const msg = new SpeechSynthesisUtterance()
-    //msg.voice = window.speechSynthesis.getVoices()[config.speech.voice]
-    msg.volume = config.soundVolume // From 0 to 1
-    //msg.rate = config.speech.rate // From 0.1 to 10
-    //msg.pitch = config.speech.pitch // From 0 to 2
-    msg.text = speechText
-    msg.lang = config.speechLanguage
-    speechSynthesis.speak(msg)
+  mute() {
+    this.isMuted = true
+  }
+
+  unmute() {
+    this.isMuted = false
   }
 }

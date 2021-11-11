@@ -1,9 +1,9 @@
 var path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const CopyPlugin = require('webpack-copy-plugin')
+const CopyPlugin = require('copy-webpack-plugin')
 
 var config = {
-  entry: ['./src/index.tsx', __dirname + '/src/scss/main.scss'],
+  entry: ['./src/index.tsx', __dirname + '/src/main.scss'],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.min.js'
@@ -39,10 +39,14 @@ var config = {
   },
   plugins: [
     new CopyPlugin({
-      dirs: [
+      patterns: [
         {
-          from: path.resolve(__dirname, './src/assets'),
-          to: path.resolve(__dirname, './dist/assets'),
+          from: path.resolve(__dirname, './src/assets/'),
+          to: path.resolve(__dirname, "./dist/assets/"),
+        },
+        {
+          from: path.resolve('./src/config.js'),
+          to: path.resolve('./dist/config.js'),
           toType: 'file'
         }
       ]
@@ -56,6 +60,9 @@ var config = {
     contentBasePublicPath: '/',
     historyApiFallback: true,
     hot: true
+  },
+  optimization: {
+    minimize: false
   }
 }
 

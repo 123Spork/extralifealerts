@@ -1,60 +1,27 @@
-import { Donation, ELApi, Participant, Team } from './extra-life.client'
-import { TimerContent } from './helper'
-import ScreenManager from './screenManager'
-import SoundManager from './soundManager'
-
-export interface SceneContentData {
-  donation?: Donation
-  participant?: Participant
-  team?: Team
-  extraData?: {
-    timer?: TimerContent
-  }
-}
-
-export interface CustomControllers {
-  screenManager: ScreenManager
-  elAPIManager: ELApi
-  soundManager: SoundManager
-}
-
-export interface ScreenContentConfig {
-  override?: (
-    sceneData: SceneContentData,
-    controllers: CustomControllers
-  ) => Promise<string>
-  template: string
-  speak?: boolean
-  speakTemplate?: string
-  playSound?: boolean
-  soundUrl?: string
-}
-
-export interface ScreenConfig {
-  [key: string]: ScreenContentConfig
-  donationAlertPopup: ScreenContentConfig
-  donationAlertMessagePopup: ScreenContentConfig
-  gameDayTimer: ScreenContentConfig
-  gameDayCountdownTimer: ScreenContentConfig
-}
+import { CallbackFunction } from './app'
+import { ScreenFunction } from './screenManager'
 
 export interface Config {
-  participantId: number
-  teamId: number
-  eventStartTimestamp: number
-  showDonationCents: boolean
-  donationPopupTimeout: number
-  donationMessagePopupTimeout: number
-  mockEnabled?: boolean
-  soundVolume: number
-  speechLanguage: string
-  timer: {
-    elementId: string
-    template: string
+  main: {
+    participantId: number
+    teamId: number
+    eventStartTimestamp: number
+    soundVolume: number
+    speechLanguage: string
+    mockEnabled?: boolean
   }
-  content: {
-    [key: string]: ScreenConfig
+  screens: {
+    [key: string]: ScreenFunction
   }
+  onStart: CallbackFunction
+  onTimerTick: CallbackFunction
+  onNewDonations: CallbackFunction
 }
+
+export const getConfig = (): Config => {
+  //@ts-ignore
+  return Window.globalConfiguration
+}
+
 // @ts-ignore
 export default Window.globalConfiguration as Config

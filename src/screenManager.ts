@@ -1,96 +1,81 @@
 import mustache from 'mustache'
-import { CustomControllers, SceneContentData } from './config'
-import { getConfigForScreen, getDivById, ScreenEnum } from './helper'
-import { screenKeys } from './helper'
-import { api as elApi } from './extra-life.client'
-import './scss/main.scss'
-import SoundManager from './soundManager'
+import Controller from './controller'
+
+export type ScreenFunction = (
+  data: Record<string, unknown>,
+  controller: Controller
+) => Promise<string>
+
+export interface Screen {
+  configuration: ScreenFunction
+  data: Record<string, unknown>
+  controller: Controller
+  timeToShow?: number
+}
 
 export default class ScreenManager {
-  currentScreen: ScreenEnum
-  soundManager: SoundManager
+  queuedScreens: Screen[]
+  currentScreen: Screen | null
+  isDirty: boolean
 
-  constructor(soundManager: SoundManager) {
-    this.hideScreen = this.hideScreen.bind(this)
-    this.showScreen = this.showScreen.bind(this)
-    this.goToScreen = this.goToScreen.bind(this)
-    this.generateContent = this.generateContent.bind(this)
-    this.setDivContentById = this.setDivContentById.bind(this)
-    this.processAndActivateScreenContent = this.processAndActivateScreenContent.bind(
-      this
-    )
-    this.createContentChangeTimeout = this.createContentChangeTimeout.bind(this)
-    this.currentScreen = ScreenEnum.gameDayTimer
-    this.soundManager = soundManager
-  }
-
-  hideScreen(divId: string): void {
-    ;(document.getElementById(divId) as HTMLDivElement).classList.add('hide')
-  }
-
-  showScreen(divId: string): void {
-    ;(document.getElementById(divId) as HTMLDivElement).classList.remove('hide')
-  }
-
-  goToScreen(divId: string): void {
-    for (var i = 0; i < screenKeys.length; i++) {
-      this.hideScreen(screenKeys[i])
-    }
-    this.showScreen(divId)
+  constructor() {
+    this.addToScreenQueue = this.addToScreenQueue.bind(this)
+    this.render = this.render.bind(this)
+    this.queuedScreens = []
+    this.currentScreen = null
+    this.isDirty = true
+    window.setInterval(this.render, 1000 / 30)
   }
 
   generateContent(template: string, data: Record<string, any>): string {
     return mustache.render(template, data)
   }
 
-  setDivContentById(
+  addToScreenQueue(screen: Screen) {
+    this.queuedScreens.push(screen)
+  }
+
+  async loadScreen(screen: Screen) {
+    const template = await screen.configuration(screen.data, screen.controller)
+    ;(document.getElementById(
+      'scene'
+    ) as HTMLDivElement).innerHTML = mustache.render(template, screen.data)
+  }
+
+  async processNextScreen() {
+    this.currentScreen = this.queuedScreens[0]
+    await this.loadScreen(this.currentScreen)
+    window.setTimeout(() => {
+      this.queuedScreens.splice(0, 1)
+      this.isDirty = true
+    }, this.currentScreen.timeToShow || 0)
+  }
+
+  async refreshIdInCurrent(
     id: string,
-    template: string,
-    data: Record<string, any>
-  ): void {
-    getDivById(id).innerHTML = mustache.render(template, data)
-  }
-
-  async processAndActivateScreenContent(
-    screenName: ScreenEnum,
-    sceneContentData: SceneContentData
+    dataOverrides: Record<string, any> = {}
   ) {
-    const screenConfig = getConfigForScreen(screenName)
-    let content
-    if (screenConfig.override) {
-      content = await screenConfig.override(sceneContentData, {
-        screenManager: this,
-        elAPIManager: elApi,
-        soundManager: this.soundManager
-      } as CustomControllers)
-    } else {
-      const template = screenConfig.template
-      content = this.generateContent(template, sceneContentData)
+    const element = document.getElementById(id)
+    if (!this.currentScreen || !element) {
+      return
     }
-    getDivById(screenName).innerHTML = content
-    this.goToScreen(screenName)
-    console.log(screenConfig)
-    if (screenConfig.playSound === true) {
-      this.soundManager.playSound(screenConfig.soundUrl || 'sounds/cash.mp3')
-    }
-    if (screenConfig.speak === true) {
-      this.soundManager.saySomething(
-        this.generateContent(
-          screenConfig.speakTemplate || 'Default sentence. Overwrite me!',
-          sceneContentData
-        )
-      )
+    this.currentScreen.data = { ...this.currentScreen.data, ...dataOverrides }
+    const template = await this.currentScreen.configuration(
+      this.currentScreen.data,
+      this.currentScreen.controller
+    )
+    const div = document.createElement('div')
+    div.innerHTML = mustache.render(template, this.currentScreen.data)
+    const newElementContent = div.querySelector('#' + id)
+    if (newElementContent) {
+      element.innerHTML = newElementContent.innerHTML
     }
   }
 
-  async createContentChangeTimeout(
-    screenName: ScreenEnum,
-    timeout: number,
-    sceneContentData: SceneContentData
-  ) {
-    const self = this
-    window.setTimeout(async (): Promise<void> => {
-      self.processAndActivateScreenContent(screenName, sceneContentData)
-    }, timeout)
+  render() {
+    if (this.isDirty && this.queuedScreens.length > 0) {
+      this.isDirty = false
+      this.processNextScreen()
+    }
   }
 }
