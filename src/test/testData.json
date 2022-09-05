@@ -56,5 +56,56 @@
     "sumPledges": 0.0,
     "streamingChannel": "AspectHistory",
     "numDonations": 2
-  }
+  },
+  "team": {
+    "numParticipants": 25,
+    "fundraisingGoal": 100000.0,
+    "eventName": "Extra Life 2022",
+    "links": {
+      "stream": "https://player.twitch.tv/?channel=imgur",
+      "page": "https://www.extra-life.org/index.cfm?fuseaction=donorDrive.team&teamID=60467"
+    },
+    "hasActivityTracking": false,
+    "captainDisplayName": "Imgur",
+    "streamIsLive": false,
+    "hasTeamOnlyDonations": false,
+    "streamingPlatform": "Twitch",
+    "isCustomAvatarImage": true,
+    "eventID": 552,
+    "sumDonations": 785.0,
+    "createdDateUTC": "2022-01-26T00:35:44.260+0000",
+    "sourceTeamID": 40089,
+    "name": "Imgur",
+    "avatarImageURL": "https://assets.donordrive.com/extralife/images/$event552$/avatar_team_60467.jpg",
+    "teamID": 60467,
+    "streamIsEnabled": true,
+    "sumPledges": 0.0,
+    "streamingChannel": "imgur",
+    "numDonations": 12
+  },
+  "milestones":[
+    {
+      "fundraisingGoal": 1000,
+      "description": "Pie in the face!",
+      "milestoneID": "F611075E-B722-E1A7-C91690575DD48210",
+      "isActive": true,
+      "isComplete": true
+    },
+    {
+      "fundraisingGoal": 2500,
+      "description": "I'll eat a spoonful of hot sauce!",
+      "milestoneID": "200F1E52-EDD2-3E85-CD951C029594E855",
+      "isActive": true,
+      "isComplete": true
+    },
+    {
+      "fundraisingGoal": 5000,
+      "description": "I'll dye my hair!",
+      "links": {
+        "donate": "https://try.donordrive.com/index.cfm?fuseaction=donorDrive.participant&participantID=15882&donationAmount=401.50#donate"
+      },
+      "milestoneID": "22BA1A3A-1234-FF6A-394361D3FF9304FF",
+      "isActive": true
+    }
+  ]
 }

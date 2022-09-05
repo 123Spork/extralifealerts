@@ -3,6 +3,7 @@ import * as ReactDOM from 'react-dom'
 import './styles/main.scss'
 import Controller, { ScreenData } from './controller'
 import { Donation, TimerContent } from './managers'
+import { Milestone } from './managers/extraLifeManager'
 
 export type CallbackFunction = (
   sceneContentData: ScreenData,
@@ -13,15 +14,20 @@ class App {
   controller: Controller
   onStart: CallbackFunction
   onNewDonations: CallbackFunction
+  onMilestonesReached: CallbackFunction
   onTimerTick: CallbackFunction
 
   constructor(callbacks: {
     onStart?: CallbackFunction
     onNewDonations?: CallbackFunction
+    onMilestonesReached?: CallbackFunction
     onTimerTick?: CallbackFunction
   }) {
     this.onNewDonations = callbacks.onNewDonations
       ? callbacks.onNewDonations
+      : () => {}
+    this.onMilestonesReached = callbacks.onMilestonesReached
+      ? callbacks.onMilestonesReached
       : () => {}
     this.onStart = callbacks.onStart ? callbacks.onStart : () => {}
     this.onTimerTick = callbacks.onTimerTick ? callbacks.onTimerTick : () => {}
@@ -29,6 +35,7 @@ class App {
     this.controller = new Controller({
       onTimerTick: this.onTick.bind(this),
       onNewDonations: this.onDonations.bind(this),
+      onMilestonesReached: this.onMilestones.bind(this),
       onExtraLifeLoaded: async () => {
         await this.onStart(this.controller.getData(), this.controller)
       }
@@ -48,6 +55,14 @@ class App {
   async onDonations(donations: Donation[]) {
     this.onNewDonations(
       { ...this.controller.getData(), donations },
+      this.controller
+    )
+  }
+
+  async onMilestones(milestones: Milestone[]) {
+    debugger;
+    this.onMilestonesReached(
+      { ...this.controller.getData(), milestones },
       this.controller
     )
   }
