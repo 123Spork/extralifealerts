@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom'
 import './styles/main.scss'
 import Controller, { ScreenData } from './controller'
 import { Donation, TimerContent } from './managers'
-import { Badge, Milestone } from './managers/extraLifeManager'
+import { Badge, Incentive, Milestone } from './managers/extraLifeManager'
 
 export type CallbackFunction = (
   sceneContentData: ScreenData,
@@ -15,6 +15,7 @@ class App {
   onStart: CallbackFunction
   onNewDonations: CallbackFunction
   onMilestonesReached: CallbackFunction
+  onIncentivesPurchased: CallbackFunction
   onBadgesObtained: CallbackFunction
   onTimerTick: CallbackFunction
 
@@ -22,6 +23,7 @@ class App {
     onStart?: CallbackFunction
     onNewDonations?: CallbackFunction
     onMilestonesReached?: CallbackFunction
+    onIncentivesPurchased?: CallbackFunction
     onBadgesObtained?: CallbackFunction
     onTimerTick?: CallbackFunction
   }) {
@@ -30,6 +32,9 @@ class App {
       : () => {}
     this.onMilestonesReached = callbacks.onMilestonesReached
       ? callbacks.onMilestonesReached
+      : () => {}
+    this.onIncentivesPurchased = callbacks.onIncentivesPurchased
+      ? callbacks.onIncentivesPurchased
       : () => {}
     this.onBadgesObtained = callbacks.onBadgesObtained
       ? callbacks.onBadgesObtained
@@ -41,6 +46,7 @@ class App {
       onTimerTick: this.onTick.bind(this),
       onNewDonations: this.onDonations.bind(this),
       onMilestonesReached: this.onMilestones.bind(this),
+      onIncentivesPurchased: this.onIncentives.bind(this),
       onBadgesObtained: this.onBadges.bind(this),
       onExtraLifeLoaded: async () => {
         await this.onStart(this.controller.getData(), this.controller)
@@ -76,6 +82,13 @@ class App {
   async onBadges(badges: Badge[]) {
     this.onBadgesObtained(
       { ...this.controller.getData(), badges },
+      this.controller
+    )
+  }
+
+  async onIncentives(incentives: Incentive[]) {
+    this.onIncentivesPurchased(
+      { ...this.controller.getData(), incentives },
       this.controller
     )
   }
