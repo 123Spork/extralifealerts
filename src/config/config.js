@@ -6,7 +6,9 @@ Window.globalConfiguration = {
     eventStartTimestamp: 1635434330000,
     soundVolume: 1,
     speechLanguage: 'en',
-    mockEnabled: true
+    speechUrl: 'http://localhost:5000/base64',
+    mockEnabled: true,
+    popupsEnabled: false
   },
   screens: {
     donationAlertPopup: (data, controller) => {

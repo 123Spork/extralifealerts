@@ -15,7 +15,7 @@ var config = {
     rules: [
       {
         test: /\.tsx?$/,
-        loader: 'awesome-typescript-loader'
+        loader: 'ts-loader'
       },
       {
         test: /\.s[ac]ss$/i,
@@ -56,8 +56,7 @@ var config = {
     })
   ],
   devServer: {
-    contentBase: path.join(__dirname, 'src'),
-    contentBasePublicPath: '/',
+    static: path.join(__dirname, 'src'),
     historyApiFallback: true,
     hot: true
   },
